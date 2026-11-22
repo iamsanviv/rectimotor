@@ -5,7 +5,7 @@ App web (PWA) para gestionar las órdenes de trabajo (OT) de la rectificadora: r
 ## Stack
 
 - **Interfaz:** HTML + CSS + JavaScript (módulos ES) sin compilación, en `public/`. Pensada para tablet Android; funciona en PC y celular.
-- **Hosting:** Cloudflare Workers (archivos estáticos), configuración en `wrangler.jsonc`.
+- **Hosting:** Cloudflare Workers (archivos estáticos), configuración en `wrangler.jsonc`. Cada push a `main` se publica solo (Workers Builds: `npm run build` + `npx wrangler deploy`).
 - **Datos:** Supabase (Postgres + Auth + Storage). Proyecto `rectingenieria`.
 - **Reglas del negocio:** en la base de datos (`supabase/migrations`). El navegador no puede cambiar estados, totales ni saldos directamente: todo pasa por funciones RPC que validan y escriben el historial.
 
@@ -44,3 +44,8 @@ supabase/tests/         Pruebas del esquema con PGlite (npm test)
 ```
 cd supabase/tests && npm install && npm test
 ```
+
+## Flujo de trabajo
+
+- **Cambios pequeños:** directo a `main` (se publican solos).
+- **Cambios grandes:** en una rama, y luego se fusionan a `main`.

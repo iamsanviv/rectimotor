@@ -1,0 +1,9 @@
+{
+  "name": "rectingenieria",
+  "private": true,
+  "description": "App de órdenes de trabajo de Rectingeniería. Sin compilación: se publica la carpeta public/ tal cual.",
+  "scripts": {
+    "build": "echo \"Sin compilación: se publica public/ tal cual\"",
+    "test": "cd supabase/tests && npm install --silent && npm test"
+  }
+}

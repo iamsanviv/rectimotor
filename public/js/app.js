@@ -16,31 +16,47 @@ const ROUTES = [
   { path: /^\/cuenta$/, view: () => import('./views/account.js'), nav: 'cuenta' },
 ];
 
+const ICON = {
+  tablero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  nueva: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  ordenes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  cartera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  clientes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  usuarios: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  cuenta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+};
+
 const NAV = [
-  ['tablero', '#/', '▦', 'Tablero'],
-  ['nueva', '#/nueva', '＋', 'Nueva OT'],
-  ['ordenes', '#/ordenes', '☰', 'Órdenes'],
-  ['cartera', '#/cartera', '$', 'Cartera'],
-  ['clientes', '#/clientes', '👤', 'Clientes'],
-  ['usuarios', '#/usuarios', '⚙', 'Usuarios', true],
+  ['tablero', '#/', 'Tablero'],
+  ['nueva', '#/nueva', 'Nueva OT'],
+  ['ordenes', '#/ordenes', 'Órdenes'],
+  ['cartera', '#/cartera', 'Cartera'],
+  ['clientes', '#/clientes', 'Clientes'],
+  ['usuarios', '#/usuarios', 'Usuarios', true],
 ];
 
+const initials = (n) => String(n || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
 function shell() {
-  const items = NAV.filter((n) => !n[4] || ctx.isAdmin);
-  const mobile = items.filter((n) => ['tablero', 'nueva', 'ordenes', 'cartera'].includes(n[0])).concat([['cuenta', '#/cuenta', '●', 'Cuenta']]);
+  const items = NAV.filter((n) => !n[3] || ctx.isAdmin);
+  const tab = (key, href, label) => `<a href="${href}" data-nav="${key}">${ICON[key]}${label}</a>`;
   $('#root').innerHTML = `<div class="app">
     <aside class="side">
-      <div class="brand"><div class="brand-mark">RI</div><div><b>${esc(COMPANY.name)}</b><small>Órdenes de trabajo</small></div></div>
-      <nav class="nav">${items.map((n) => `<a href="${n[1]}" data-nav="${n[0]}"><span class="ico">${n[2]}</span>${n[3]}</a>`).join('')}</nav>
-      <div class="side-foot"><b>${esc(ctx.me.full_name)}</b><span class="muted">${ctx.isAdmin ? 'Administrador' : 'Técnico'}</span><br>
-        <a href="#/cuenta" data-nav="cuenta">Mi cuenta</a></div>
+      <a class="logo-plate" href="#/"><img src="/img/logo-emblem.jpg" alt="${esc(COMPANY.name)}" width="196" height="94"><small>Rectificadora Diésel y Gasolina</small></a>
+      <nav class="nav">${items.map((n) => tab(n[0], n[1], n[2])).join('')}</nav>
+      <a class="side-foot" href="#/cuenta" data-nav="cuenta"><span class="avatar">${esc(initials(ctx.me.full_name))}</span>
+        <div><b>${esc(ctx.me.full_name)}</b><span>${ctx.isAdmin ? 'Administrador' : 'Técnico'} · Mi cuenta</span></div></a>
     </aside>
     <main class="main">
-      <div class="topbar"><div class="brand" style="padding:0"><div class="brand-mark" style="width:34px;height:34px">RI</div><b>${esc(COMPANY.name)}</b></div>
-        ${ctx.isAdmin ? '<a class="btn ghost" href="#/usuarios">⚙</a>' : ''}</div>
+      <div class="topbar"><a class="logo-plate" href="#/"><img src="/img/logo-emblem.jpg" alt="${esc(COMPANY.name)}" width="96" height="46"></a>
+        <a class="avatar" href="#/cuenta" style="text-decoration:none">${esc(initials(ctx.me.full_name))}</a></div>
       <div class="content" id="view"></div>
     </main>
-    <nav class="tabbar">${mobile.map((n) => `<a href="${n[1]}" data-nav="${n[0]}"><span class="ico">${n[2]}</span>${n[3]}</a>`).join('')}</nav>
+    <nav class="tabbar">
+      ${tab('tablero', '#/', 'Tablero')}${tab('ordenes', '#/ordenes', 'Órdenes')}
+      <a href="#/nueva" data-nav="nueva" aria-label="Nueva orden de trabajo"><span class="fab">${ICON.nueva}</span></a>
+      ${tab('cartera', '#/cartera', 'Cartera')}${tab('cuenta', '#/cuenta', 'Cuenta')}
+    </nav>
   </div>`;
 }
 
@@ -77,7 +93,7 @@ function subscribeRealtime() {
 
 function loginView(firstRun) {
   $('#root').innerHTML = `<div class="login-wrap"><div class="card login">
-    <div class="brand" style="padding:0 0 14px"><div class="brand-mark">RI</div><div><b>${esc(COMPANY.name)}</b><small>Órdenes de trabajo</small></div></div>
+    <img class="login-logo" src="/img/logo.jpg" alt="${esc(COMPANY.name)}" width="300" height="300">
     ${firstRun ? `<h2>Crear el administrador</h2><p class="muted small">Aún no hay usuarios. Esta cuenta será la del administrador.</p>
       <form id="f" class="grid">
         <label class="field"><span>Nombre</span><input name="full_name" required autocomplete="name"></label>

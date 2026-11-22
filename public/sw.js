@@ -1,7 +1,7 @@
 // Service worker mínimo: permite instalar la app y carga rápido la interfaz.
 // Los datos siempre se piden en línea (no hay modo sin conexión).
-const CACHE = 'rectingenieria-v1';
-const SHELL = ['/', '/index.html', '/css/app.css?v=1', '/js/app.js?v=1', '/manifest.webmanifest', '/icons/icon.svg'];
+const CACHE = 'rectingenieria-v2';
+const SHELL = ['/', '/index.html', '/css/app.css?v=2', '/js/app.js?v=2', '/manifest.webmanifest', '/img/logo-emblem.jpg'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

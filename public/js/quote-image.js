@@ -14,6 +14,14 @@ function wrap(ctx, text, maxWidth) {
   return lines;
 }
 
+function loadImage(src) {
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
 export async function quoteImage(o, quote, conceptNames) {
   const W = 1080, P = 64;
   const c = document.createElement('canvas');
@@ -22,12 +30,17 @@ export async function quoteImage(o, quote, conceptNames) {
   c.width = W;
   c.height = 760 + items.length * 64 + (quote.notes_for_customer ? 160 : 0);
   ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, c.height);
-  ctx.fillStyle = '#b4231f'; ctx.fillRect(0, 0, W, 150);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 52px system-ui, Arial'; ctx.fillText(COMPANY.name, P, 88);
-  ctx.font = '28px system-ui, Arial'; ctx.fillText(COMPANY.phone, P, 128);
-  ctx.textAlign = 'right'; ctx.font = 'bold 34px system-ui, Arial'; ctx.fillText('Cotización', W - P, 88);
-  ctx.font = '28px system-ui, Arial'; ctx.fillText(`${o.code} · v${quote.version}`, W - P, 128);
+  ctx.fillStyle = '#0d0d0e'; ctx.fillRect(0, 0, W, 150);
+  const logo = await loadImage('/img/logo-emblem.jpg').catch(() => null);
+  if (logo) {
+    ctx.fillStyle = '#ffffff'; roundRect(ctx, P - 8, 18, 252, 116, 14); ctx.fill();
+    ctx.drawImage(logo, P, 20, 236, 113);
+  } else {
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px system-ui, Arial'; ctx.fillText(COMPANY.name, P, 96);
+  }
+  ctx.textAlign = 'right'; ctx.fillStyle = '#f1c94b'; ctx.font = 'bold 40px system-ui, Arial'; ctx.fillText('COTIZACIÓN', W - P, 72);
+  ctx.fillStyle = '#ffffff'; ctx.font = '28px system-ui, Arial'; ctx.fillText(`${o.code} · v${quote.version}`, W - P, 110);
+  ctx.fillStyle = '#cfccc5'; ctx.font = '24px system-ui, Arial'; ctx.fillText(COMPANY.phone, W - P, 140);
   ctx.textAlign = 'left';
 
   let y = 220;
@@ -47,7 +60,8 @@ export async function quoteImage(o, quote, conceptNames) {
   ctx.fillStyle = '#e2e8f0'; ctx.fillRect(P, y - 30, W - 2 * P, 3);
   y += 40;
   ctx.fillStyle = '#0f172a'; ctx.font = 'bold 40px system-ui, Arial'; ctx.fillText('Total', P, y);
-  ctx.textAlign = 'right'; ctx.fillStyle = '#b4231f'; ctx.font = 'bold 48px system-ui, Arial'; ctx.fillText(money(quote.total), W - P, y); ctx.textAlign = 'left';
+  ctx.textAlign = 'right'; ctx.fillStyle = '#0d0d0e'; ctx.font = 'bold 48px system-ui, Arial'; ctx.fillText(money(quote.total), W - P, y); ctx.textAlign = 'left';
+  ctx.fillStyle = '#c9a227'; ctx.fillRect(W - P - 260, y + 14, 260, 4);
   y += 44; ctx.fillStyle = '#64748b'; ctx.font = '26px system-ui, Arial'; ctx.fillText('IVA incluido · Mano de obra incluida', P, y);
   if (quote.valid_until) { y += 40; ctx.fillText(`Válida hasta el ${date(quote.valid_until + 'T12:00:00')}`, P, y); }
   if (quote.notes_for_customer) {
